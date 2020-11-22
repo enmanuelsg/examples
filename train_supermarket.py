@@ -41,6 +41,7 @@ class Word2VecClassification:
         for doc in tokenized_corpus:
             doc =  [x for x in doc if x not in self.sw]
             vec = self.buildWordVector(doc)
+            vec = np.nan_to_num(vec.astype(np.float32))
             docs.append(vec)
         return docs
 
