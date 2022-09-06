@@ -35,5 +35,5 @@ def run_quiz(questions, question_qty):
      ratio = '{:.0%}'.format(score/question_qty)
      print("You got", score, "out of", question_qty, "\nScore:", ratio)
 
-run_quiz(questions_set['prepositions'], 2)
+run_quiz(questions_set['prepositions'], 5)
 
