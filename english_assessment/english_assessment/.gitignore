@@ -1,6 +1,9 @@
 # Ignore SQLite database files
 *.sqlite3
 
+# Explicitly include db.sqlite3
+!db.sqlite3
+
 # Ignore all __pycache__ directories
 **/__pycache__/
 
