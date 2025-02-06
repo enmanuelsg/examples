@@ -1,9 +1,20 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
+from django.db import connection
+from django.http import JsonResponse
+from django.shortcuts import render
+
 from .forms import RegistrationForm
 from .models import Question, QuizAttempt, Answer
 import random
+
+
+def home(request):
+    return render(request, 'home.html')
+
+def rankings_page(request):
+    return render(request, 'quiz/rankings.html')
 
 def register_view(request):
     if request.method == 'POST':
@@ -114,3 +125,22 @@ def quiz_question(request):
 
     # Display unanswered question
     return render(request, 'quiz/question.html', {'question': question})
+
+
+def user_rankings(request):
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT au.username,
+                COUNT(au.username) as total_quiz,
+                SUM(qa.is_correct) as correct_quiz,
+                ROUND(AVG(qa.is_correct), 2) as score
+            FROM quiz_answer qa
+            INNER JOIN quiz_quizattempt qq ON qa.quiz_attempt_id = qq.id
+            INNER JOIN auth_user au ON qq.user_id = au.id
+            GROUP BY au.username
+            ORDER BY score DESC;
+        """)
+        columns = [col[0] for col in cursor.description]
+        rankings = [dict(zip(columns, row)) for row in cursor.fetchall()]
+
+    return JsonResponse({"rankings": rankings})
